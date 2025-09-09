@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio with Image Background Removal</title>
+    <link rel="stylesheet" href="index.css">
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <header>
+        <nav>
+            <ul>
+                <li><a href="#home">Home</a></li>
+                <li><a href="#contact">Contact</a></li>
+                <li><a href="#about">About</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <section id="home">
+            <h1>Welcome to My Portfolio</h1>
+            <p>Showcasing work and removing image backgrounds instantly!</p>
+        </section>
+
+        <section id="upload-section">
+            <h2>Upload an Image</h2>
+            <div class="upload-card">
+                <input type="file" id="imageUpload" accept="image/*">
+                <p class="hint">PNG or JPG up to 10MB. Background will be removed after upload.</p>
+
+                <div id="preview-container">
+                    <img id="preview" src="" alt="Uploaded Preview">
+                </div>
+
+                <div id="result-container">
+                    <img id="result" src="" alt="Background Removed Image">
+                    <button id="downloadBtn" class="button" style="display: none;">⬇ Download</button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-left">
+            <img src="logo.png" alt="Logo" class="logo">
+        </div>
+        <div class="footer-right">
+            <p>© 2025 My Portfolio | All Rights Reserved</p>
+        </div>
+    </footer>
+
+    <script>
+        const imageUpload = document.getElementById("imageUpload");
+        const preview = document.getElementById("preview");
+        const result = document.getElementById("result");
+        const downloadBtn = document.getElementById("downloadBtn");
+
+        imageUpload.addEventListener("change", async function () {
+            const file = this.files[0];
+            if (!file) return;
+
+            // Show preview
+            preview.src = URL.createObjectURL(file);
+            preview.style.display = "block";
+            result.style.display = "none";
+            downloadBtn.style.display = "none";
+
+            // Dummy API for background removal (replace with your actual API)
+            const API_URL = "https://api.remove.bg/v1.0/removebg"; // change this
+            const API_KEY = "NKKwz3AhFdcZVnHYAXg251kA"; // change this
+
+            const formData = new FormData();
+            formData.append("image_file", file);
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: "POST",
+                    headers:{
+                        "X-Api-Key": API_KEY
+                    },
+                    body: formData
+                });
+
+                if (!response.ok) throw new Error("Background removal failed");
+
+                const blob = await response.blob();
+                const resultURL = URL.createObjectURL(blob);
+
+                result.src = resultURL;
+                result.style.display = "block";
+
+                // Enable download button
+                downloadBtn.style.display = "inline-flex";
+                downloadBtn.onclick = function () {
+                    const a = document.createElement("a");
+                    a.href = resultURL;
+                    a.download = "background_removed.png";
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                };
+
+            } catch (error) {
+                alert("Error: " + error.message);
+            }
+        });
+    </script>
+
+</body>
+
+</html>
